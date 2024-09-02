@@ -23,3 +23,18 @@ CREATE TABLE sessions (
     expiry TIMESTAMP(6) NOT NULL
 );
 CREATE INDEX sessions_expiry_idx ON sessions (expiry);
+
+-- tabela para as tags
+CREATE TABLE tags (
+    id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) UNIQUE NOT NULL
+);
+
+-- tabela para o relacionamento snippets - tags
+CREATE TABLE snippet_tags (
+    snippet_id INTEGER NOT NULL,
+    tag_id INTEGER NOT NULL,
+    PRIMARY KEY (snippet_id, tag_id),
+    FOREIGN KEY (snippet_id) REFERENCES snippets(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+);
