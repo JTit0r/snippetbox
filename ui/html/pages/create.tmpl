@@ -27,6 +27,13 @@
       <input type="radio" name="expires" value="1" {{if (eq .Form.Expires 1)}}checked{{end}}> One Day
     </div>
     <div>
+      <label>Tags: </label> <!-- Novo campo para as tags -->
+      {{with .Form.FieldErrors.tags}}
+      <label class="error">{{.}}</label>
+      {{end}}
+      <input type="text" name="tags" placeholder="Enter tags separated by commas" value="{{.Form.Tags}}">
+    </div>
+    <div>
       <input type="submit" value="Publish snippet">
     </div>
   </form>
