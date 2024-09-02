@@ -8,6 +8,7 @@ import (
 	"runtime/debug"
 
 	"github.com/go-playground/form/v4"
+	"strings" //pacote strings
 )
 
 func (app *application) serverError(w http.ResponseWriter, err error) {
@@ -79,4 +80,13 @@ func (app *application) isAuthenticated(r *http.Request) bool {
 		return false
 	}
 	return isAuthenticated
+}
+
+//Parse tags
+func parseTags(tagsStr string) []string {
+	tags := strings.Split(tagsStr, ",")
+	for i, tag := range tags {
+		tags[i] = strings.TrimSpace(tag)
+	}
+	return tags
 }

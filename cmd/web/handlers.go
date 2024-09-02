@@ -15,6 +15,7 @@ type snippetCreateForm struct {
 	Title               string `form:"title"`
 	Content             string `form:"content"`
 	Expires             int    `form:"expires"`
+	Tags                string `form:"tags"` // Novo campo para as tags
 	validator.Validator `form:"-"`
 }
 
@@ -129,6 +130,16 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		app.serverError(w, err)
 		return
+	}
+
+	// Processar as tags
+	tags := parseTags(form.Tags)
+	for _, tag := range tags {
+		err = app.snippets.AddTag(id, tag)
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
 	}
 
 	app.sessionManager.Put(r.Context(), "flash", "Snippet successfully created")
