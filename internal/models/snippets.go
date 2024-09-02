@@ -10,6 +10,7 @@ type SnippetModelService interface {
 	Insert(title, content string, expires int) (int, error)
 	Get(id int) (*Snippet, error)
 	Latest() ([]*Snippet, error)
+	AddTag(snippetID int, tag string) error //novo método para adicionar tags
 }
 
 type Snippet struct {
@@ -82,4 +83,25 @@ func (m *SnippetModel) Latest() ([]*Snippet, error) {
 	}
 
 	return snippets, nil
+}
+
+// AddTag associa uma tag a um snippet.
+func (m *SnippetModel) AddTag(snippetID int, tag string) error {
+	// Insere a tag na tabela se ela ainda não existir
+	stmt := `INSERT INTO tags (name) VALUES(?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)`
+	result, err := m.DB.Exec(stmt, tag)
+	if err != nil {
+		return err
+	}
+
+	// pega o ID da tag inserida ou encontrada
+	tagID, err := result.LastInsertId()
+	if err != nil {
+		return err
+	}
+
+	// Insere o relacionamento na tabela snippet_tags
+	stmt = `INSERT INTO snippet_tags (snippet_id, tag_id) VALUES(?, ?)`
+	_, err = m.DB.Exec(stmt, snippetID, tagID)
+	return err
 }
