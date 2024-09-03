@@ -11,6 +11,7 @@ type SnippetModelService interface {
 	Get(id int) (*Snippet, error)
 	Latest() ([]*Snippet, error)
 	AddTag(snippetID int, tag string) error //novo método para adicionar tags
+	GetTags(snippetID int) ([]string, error) 
 }
 
 type Snippet struct {
@@ -19,6 +20,7 @@ type Snippet struct {
 	Content string
 	Created time.Time
 	Expires time.Time
+	Tags    []string  // campo para as tags
 }
 
 type SnippetModel struct {
@@ -56,6 +58,43 @@ func (m *SnippetModel) Get(id int) (*Snippet, error) {
 		return nil, err
 	}
 	return s, nil
+}
+
+// GetTags retrieves the tags associated with a given snippet.
+func (m *SnippetModel) GetTags(snippetID int) ([]string, error) {
+	// SQL query to retrieve tag names for a specific snippet ID
+	stmt := `
+		SELECT t.name FROM tags t
+		INNER JOIN snippet_tags st ON t.id = st.tag_id
+		WHERE st.snippet_id = ?`
+
+	// Execute the query
+	rows, err := m.DB.Query(stmt, snippetID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Slice to hold the tag names
+	var tags []string
+
+	// Loop through the rows and append each tag name to the slice
+	for rows.Next() {
+		var tag string
+		err := rows.Scan(&tag)
+		if err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+
+	// Check for any error encountered during iteration
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	// Return the slice of tags
+	return tags, nil
 }
 
 func (m *SnippetModel) Latest() ([]*Snippet, error) {
