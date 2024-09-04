@@ -68,7 +68,7 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Retrieve the snippet, including its tags.
+	// recupera o snippet, incluindo as tags
 	snippet, err := app.snippets.Get(id)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
@@ -79,14 +79,14 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Retrieve the tags associated with the snippet.
+	// recupera as tags associadas ao snippet
 	tags, err := app.snippets.GetTags(id)
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	// Add the tags to the snippet struct.
+	// adiciona as tags ao struct do snippet
 	snippet.Tags = tags
 
 	data := app.newTemplateData(r)
