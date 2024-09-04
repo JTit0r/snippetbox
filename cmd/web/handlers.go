@@ -159,6 +159,30 @@ func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request
 		w, r, fmt.Sprintf("/snippet/view/%d", id), http.StatusSeeOther)
 }
 
+// Handler para realizar a pesquisa
+// recupera a query de pesquisa
+// busca no banco por snippets que satisfaçam a pesquisa
+// passa os resultados para o template
+func (app *application) searchSnippets(w http.ResponseWriter, r *http.Request) {
+    query := r.URL.Query().Get("q")
+    if query == "" {
+        http.Redirect(w, r, "/", http.StatusSeeOther)
+        return
+    }
+
+    snippets, err := app.snippets.Search(query)
+    if err != nil {
+        app.serverError(w, err)
+        return
+    }
+
+    data := app.newTemplateData(r)
+    data.Snippets = snippets
+    data.SearchQuery = query
+
+    app.render(w, http.StatusOK, "search.tmpl", data)
+}
+
 func (app *application) userSignupView(
 	w http.ResponseWriter, r *http.Request,
 ) {
