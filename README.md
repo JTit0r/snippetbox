@@ -6,6 +6,7 @@ Projeto apresentado como avaliação final na UC Tópicos em Tecnologia da Compu
 
 ## Features
 - Adicionadas tags aos snippets
+- Implementada uma feature de pesquisa de snippets
 
 ## Local development
 ```bash
