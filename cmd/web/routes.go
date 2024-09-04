@@ -42,6 +42,8 @@ func (app *application) routes() http.Handler {
 	r.With(protected...).Post(
 		"/snippet/create", app.snippetCreatePost)
 
+	r.With(dynamic...).Get("/search", app.searchSnippets) // rota para search
+
 	r.With(dynamic...).Get(
 		"/user/signup", app.userSignupView)
 	r.With(dynamic...).Post(
