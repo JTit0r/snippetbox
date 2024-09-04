@@ -12,6 +12,7 @@ type SnippetModelService interface {
 	Latest() ([]*Snippet, error)
 	AddTag(snippetID int, tag string) error //novo método para adicionar tags
 	GetTags(snippetID int) ([]string, error) 
+	Search(query string) ([]*Snippet, error) //novo método para a pesquisa de snippets
 }
 
 type Snippet struct {
@@ -60,25 +61,25 @@ func (m *SnippetModel) Get(id int) (*Snippet, error) {
 	return s, nil
 }
 
-// GetTags retrieves the tags associated with a given snippet.
+// GetTags recupera as tags associadas a um snippet
 func (m *SnippetModel) GetTags(snippetID int) ([]string, error) {
-	// SQL query to retrieve tag names for a specific snippet ID
+	// Query SQL para recuperar os nomes das tags para um snippet especifico pelo ID
 	stmt := `
 		SELECT t.name FROM tags t
 		INNER JOIN snippet_tags st ON t.id = st.tag_id
 		WHERE st.snippet_id = ?`
 
-	// Execute the query
+	// Executa a Query
 	rows, err := m.DB.Query(stmt, snippetID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	// Slice to hold the tag names
+	// para armazenar os nomes das tags
 	var tags []string
 
-	// Loop through the rows and append each tag name to the slice
+	// iterar pelas linhas e fazer append de cada nome 
 	for rows.Next() {
 		var tag string
 		err := rows.Scan(&tag)
@@ -88,13 +89,49 @@ func (m *SnippetModel) GetTags(snippetID int) ([]string, error) {
 		tags = append(tags, tag)
 	}
 
-	// Check for any error encountered during iteration
+	// checar por erros
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	// Return the slice of tags
+	// retorna os nomes das tags
 	return tags, nil
+}
+
+// método pesquisa (recebe query, retorna lista de snippets)
+func (m *SnippetModel) Search(query string) ([]*Snippet, error) {
+	stmt := `
+		SELECT s.id, s.title, s.content, s.created, s.expires 
+		FROM snippets s
+		LEFT JOIN snippet_tags st ON s.id = st.snippet_id
+		LEFT JOIN tags t ON st.tag_id = t.id
+		WHERE s.expires > UTC_TIMESTAMP() 
+		AND (s.title LIKE ? OR t.name LIKE ?)
+		GROUP BY s.id
+		ORDER BY s.created DESC`
+
+	rows, err := m.DB.Query(stmt, "%"+query+"%", "%"+query+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	snippets := []*Snippet{}
+	for rows.Next() {
+		s := &Snippet{}
+		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+		if err != nil {
+			return nil, err
+		}
+
+		snippets = append(snippets, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return snippets, nil
 }
 
 func (m *SnippetModel) Latest() ([]*Snippet, error) {
