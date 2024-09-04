@@ -2,6 +2,10 @@
 
 {{define "main"}}
   <h2>Latest Snippets</h2>
+  <form action="/search" method="get">
+    <input type="text" name="q" placeholder="Search snippets...">
+    
+  </form>
   {{if .Snippets}}
   <table>
     <tr>
