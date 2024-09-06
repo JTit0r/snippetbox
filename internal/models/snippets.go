@@ -100,7 +100,7 @@ func (m *SnippetModel) GetTags(snippetID int) ([]string, error) {
 
 // método pesquisa (recebe query, retorna lista de snippets)
 func (m *SnippetModel) Search(query string) ([]*Snippet, error) {
-	stmt := `
+	stmt := `														// query sql retorna snippets que satisfaçam título ou tags, que não tenham expirado
 		SELECT s.id, s.title, s.content, s.created, s.expires 
 		FROM snippets s
 		LEFT JOIN snippet_tags st ON s.id = st.snippet_id
@@ -110,13 +110,13 @@ func (m *SnippetModel) Search(query string) ([]*Snippet, error) {
 		GROUP BY s.id
 		ORDER BY s.created DESC`
 
-	rows, err := m.DB.Query(stmt, "%"+query+"%", "%"+query+"%")
+	rows, err := m.DB.Query(stmt, "%"+query+"%", "%"+query+"%")	// execução da query
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	snippets := []*Snippet{}
+	snippets := []*Snippet{}	// cria a lista de tags iterando sobre o resultado da query
 	for rows.Next() {
 		s := &Snippet{}
 		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
