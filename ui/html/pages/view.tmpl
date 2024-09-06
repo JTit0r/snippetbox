@@ -8,7 +8,6 @@
       <span>#{{.ID}}</span>
     </div>
     <pre><code>{{.Content}}</code></pre>
-    {{if .Tags}}
     <div class="metadata">
       Tags:
       {{range $index, $tag := .Tags}}
@@ -19,7 +18,6 @@
       <time>Created: {{humanDate .Created}}</time>
       <time>Expires: {{humanDate .Expires}}</time>
     </div>
-    {{end}}
   </div>
   {{end}}
 {{end}}
