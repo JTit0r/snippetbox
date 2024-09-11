@@ -10,9 +10,9 @@ type SnippetModelService interface {
 	Insert(title, content string, expires int) (int, error)
 	Get(id int) (*Snippet, error)
 	Latest() ([]*Snippet, error)
-	AddTag(snippetID int, tag string) error //novo método para adicionar tags
-	GetTags(snippetID int) ([]string, error) 
-	Search(query string) ([]*Snippet, error) //novo método para a pesquisa de snippets
+	AddTag(snippetID int, tag string) error // novo método para adicionar tags
+	GetTags(snippetID int) ([]string, error) // novo método para recuperar tags
+	Search(query string) ([]*Snippet, error) // novo método para a pesquisa de snippets
 }
 
 type Snippet struct {
@@ -116,7 +116,7 @@ func (m *SnippetModel) Search(query string) ([]*Snippet, error) {
 	}
 	defer rows.Close()
 
-	snippets := []*Snippet{}	// cria a lista de tags iterando sobre o resultado da query
+	snippets := []*Snippet{}	// cria a lista de snippets iterando sobre o resultado da query
 	for rows.Next() {
 		s := &Snippet{}
 		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
@@ -131,7 +131,7 @@ func (m *SnippetModel) Search(query string) ([]*Snippet, error) {
 		return nil, err
 	}
 
-	return snippets, nil
+	return snippets, nil // retorna os snippets encontrados
 }
 
 func (m *SnippetModel) Latest() ([]*Snippet, error) {
