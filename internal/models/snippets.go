@@ -100,7 +100,8 @@ func (m *SnippetModel) GetTags(snippetID int) ([]string, error) {
 
 // método pesquisa (recebe query, retorna lista de snippets)
 func (m *SnippetModel) Search(query string) ([]*Snippet, error) {
-	stmt := `														// query sql retorna snippets que satisfaçam título ou tags, que não tenham expirado
+	// query sql retorna snippets que satisfaçam título ou tags, que não tenham expirado
+	stmt := `
 		SELECT s.id, s.title, s.content, s.created, s.expires 
 		FROM snippets s
 		LEFT JOIN snippet_tags st ON s.id = st.snippet_id
